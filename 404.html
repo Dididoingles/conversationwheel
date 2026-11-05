@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="gm.ico" type="image/x-icon">
+<!-- Metatags essenciais para miniatura (Open Graph) -->
+<meta property="og:title" content="Conversation Wheel" />
+<meta property="og:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta property="og:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:url" content="https://dididoingles.github.io/conversationwheel/" />
+<meta property="og:type" content="website" />
+
+<!-- Metatags para o Twitter/X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Conversation Wheel" />
+<meta name="twitter:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta name="twitter:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<title>Página não encontrada · Conversation Spinner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e0e12;
+    --text: #f5f3ef;
+    --muted: #8a8a96;
+    --accent: #ffb86b;
+    --accent-2: #ff7a59;
+    --accent-3: #6be0c9;
+    --line: rgba(255,255,255,0.08);
+  }
+
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body{
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.58px;
+    overflow: hidden; /* Trava rolagem no desktop */
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, rgba(255,184,107,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 100%, rgba(107,224,201,0.08), transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,122,89,0.05), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ============ LAYOUT EM 2 COLUNAS ============ */
+  .stage{
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px clamp(24px, 6vw, 96px);
+    gap: 40px;
+  }
+
+  /* --- Coluna 1: A Roleta --- */
+  .wheel-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .wheel-wrap{
+    position: relative;
+    width: clamp(280px, 32vw, 400px); /* Roleta grande e imponente */
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+
+  .wheel-glow{
+    position: absolute;
+    inset: -18%;
+    background: radial-gradient(circle, rgba(255,184,107,0.16), transparent 65%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+
+  svg.wheel{
+    width: 100%;
+    height: 100%;
+    transform: rotate(0deg);
+    transition: transform 6s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 20px 60px rgba(0,0,0,0.6));
+  }
+
+  .pointer{
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 22px solid var(--accent);
+    filter: drop-shadow(0 4px 10px rgba(255,184,107,0.5));
+    z-index: 3;
+  }
+
+  .hub{
+    position: absolute;
+    width: 22%;
+    height: 22%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #23232e, #0e0e12 70%);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: grid;
+    place-items: center;
+    z-index: 2;
+    box-shadow: 0 0 0 10px rgba(14,14,18,0.9), 0 10px 30px rgba(0,0,0,0.6);
+  }
+  .hub svg{ width: 40%; height: 40%; opacity: 0.9; }
+
+  /* --- Coluna 2: Textos e Botão --- */
+  .text-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .eyebrow{
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease 0.2s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+    margin-bottom: 8px;
+  }
+
+  .error-code{
+    font-size: clamp(60px, 8vw, 110px); /* 404 imponente */
+    font-weight: 800;
+    letter-spacing: -5px;
+    line-height: 1;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease 0.3s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+    margin-bottom: 16px;
+  }
+
+  h1{
+    font-size: clamp(24px, 3.4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    line-height: 1.15;
+    max-width: 16ch;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease 0.4s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+    margin-bottom: 16px;
+  }
+  h1 span{
+    background: linear-gradient(100deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lead{
+    font-size: clamp(14px, 1.4vw, 16px);
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 46ch;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease 0.5s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+    margin-bottom: 32px;
+  }
+
+  /* Revelação dos textos depois que a roleta para */
+  .stage.revealed .error-code,
+  .stage.revealed .eyebrow,
+  .stage.revealed h1,
+  .stage.revealed .lead{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ============ BOTÃO VOLTAR ============ */
+  .cta{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 54px;
+    padding: 0 34px;
+    font-family: inherit;
+    letter-spacing: -0.58px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e0e12;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    border: none;
+    border-radius: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.6s ease 0.6s;
+    box-shadow: 0 14px 40px rgba(255,140,90,0.30), inset 0 1px 0 rgba(255,255,255,0.4);
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .stage.revealed .cta{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cta:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(255,140,90,0.42), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .cta:active{ transform: translateY(0); }
+  .cta svg{
+    width: 16px;
+    height: 16px;
+    transition: transform 0.25s ease;
+  }
+  .cta:hover svg{ transform: translateX(-3px); }
+
+  /* ============ RODAPÉ ============ */
+  .footer{
+    position: fixed; /* Fixa no fundo sem quebrar o grid */
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+    padding: 16px;
+  }
+  .footer a{
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.25s ease, opacity 0.25s ease;
+  }
+  .footer a:hover{
+    color: var(--accent-2);
+    opacity: 0.9;
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 800px){
+    html, body{
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: auto; /* Libera rolagem no mobile */
+    }
+    .stage{
+      grid-template-columns: 1fr; /* Vira uma coluna só */
+      height: auto;
+      min-height: 100vh;
+      padding: 36px 24px 60px;
+      gap: 32px;
+      text-align: center;
+    }
+    .text-col {
+      align-items: center;
+      text-align: center;
+    }
+    .wheel-wrap{
+      width: clamp(220px, 60vw, 300px); /* Menor no celular */
+    }
+    h1 {
+      max-width: 100%;
+    }
+    .cta{
+      width: 100%;
+      max-width: 320px;
+      height: 52px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main class="stage" id="stage">
+
+  <!-- COLUNA ESQUERDA: ROLETA -->
+  <div class="wheel-col">
+    <div class="wheel-wrap">
+      <div class="wheel-glow"></div>
+      <div class="pointer"></div>
+      <svg class="wheel" id="wheel" viewBox="0 0 400 400" aria-hidden="true">
+        <defs>
+          <radialGradient id="rimGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="70%" stop-color="rgba(255,255,255,0.02)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0.10)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="200" cy="200" r="196" fill="url(#rimGrad)"/>
+        <g id="wheelSlices"></g>
+        <circle cx="200" cy="200" r="188" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+      </svg>
+      <div class="hub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ffb86b" stroke-width="2" stroke-linecap="round">
+          <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUNA DIREITA: TEXTOS -->
+  <div class="text-col">
+    <div class="eyebrow">Página não encontrada</div>
+    <div class="error-code">404</div>
+    <h1>Hmm… esse <span>tópico</span> não estava na roleta.</h1>
+    <p class="lead">
+      A página que você procura pode ter mudado de lugar — ou nunca existiu.
+      Volte para a roleta e sorteie uma pergunta de verdade.
+    </p>
+    <a class="cta" href="./">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5"/>
+        <path d="M11 6l-6 6 6 6"/>
+      </svg>
+      Voltar ao início
+    </a>
+  </div>
+
+</main>
+
+<footer class="footer">
+  desenvolvido por <a href="https://www.instagram.com/dicarvalho.prof/" target="_blank" rel="noopener noreferrer">@dicarvalho.prof</a>
+</footer>
+
+<script>
+const AUDIO_URLS = {
+  spin:  "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793829943/leom2024-roleta-267662_wapjdu.mp3",
+  click: "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793830082/liecio-achive-sound-132273_hs2pcu.mp3"
+};
+
+const hasRealUrl = (u) => u && /^https?:\/\//.test(u);
+
+const audioSpin = new Audio();
+audioSpin.src = hasRealUrl(AUDIO_URLS.spin) ? AUDIO_URLS.spin : "";
+audioSpin.preload = "auto";
+audioSpin.volume = 0.30;
+
+const audioClick = new Audio();
+audioClick.src = hasRealUrl(AUDIO_URLS.click) ? AUDIO_URLS.click : "";
+audioClick.preload = "auto";
+audioClick.volume = 0.45;
+
+function playBeep(rate = 1, volume = 0.45){
+  if (!hasRealUrl(AUDIO_URLS.click)) return;
+  try{
+    const clone = audioClick.cloneNode();
+    clone.volume = volume;
+    clone.playbackRate = rate;
+    clone.play().catch(() => {});
+  } catch(e){ /* silencioso */ }
+}
+
+function playSpinSound(){
+  if (!hasRealUrl(AUDIO_URLS.spin)) return;
+  try{
+    audioSpin.currentTime = 0;
+    audioSpin.playbackRate = 0.96 + Math.random() * 0.08;
+    audioSpin.volume = 0.30;
+    audioSpin.play().catch(() => {});
+  } catch(e){ /* silencioso */ }
+}
+
+function stopSpinSound(){
+  if (!hasRealUrl(AUDIO_URLS.spin)) return;
+  try{
+    const startVol = audioSpin.volume;
+    if (startVol <= 0.01){
+      audioSpin.pause();
+      audioSpin.currentTime = 0;
+      audioSpin.volume = 0.30;
+      return;
+    }
+    const steps = 8;
+    let i = 0;
+    const fade = setInterval(() => {
+      i++;
+      const v = Math.max(0, startVol * (1 - i / steps));
+      audioSpin.volume = v;
+      if (i >= steps){
+        clearInterval(fade);
+        audioSpin.pause();
+        audioSpin.currentTime = 0;
+        audioSpin.volume = 0.30;
+      }
+    }, 50);
+  } catch(e){ /* silencioso */ }
+}
+
+const SLICE_COLORS = [
+  "#1c1c26", "#23232f", "#2a2a38", "#1a1a23",
+  "#252532", "#1f1f2a", "#2c2c3b", "#181820"
+];
+
+const wheelSlices = document.getElementById("wheelSlices");
+const wheel = document.getElementById("wheel");
+const stage = document.getElementById("stage");
+
+const SLICES = 12;
+const cx = 200, cy = 200, r = 188;
+
+function polar(cx, cy, r, angleDeg){
+  const a = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+
+function slicePath(startAngle, endAngle, rOuter){
+  const p1 = polar(cx, cy, rOuter, startAngle);
+  const p2 = polar(cx, cy, rOuter, endAngle);
+  const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+  return `M ${cx} ${cy} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} Z`;
+}
+
+function buildWheel(){
+  const sliceAngle = 360 / SLICES;
+  for (let i = 0; i < SLICES; i++){
+    const start = i * sliceAngle;
+    const end = start + sliceAngle;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", slicePath(start, end, r));
+    path.setAttribute("fill", SLICE_COLORS[i % SLICE_COLORS.length]);
+    path.setAttribute("stroke", "rgba(255,255,255,0.06)");
+    path.setAttribute("stroke-width", "1");
+    wheelSlices.appendChild(path);
+
+    const mid = start + sliceAngle / 2;
+    const np = polar(cx, cy, r * 0.80, mid);
+    const num = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    num.setAttribute("x", np.x);
+    num.setAttribute("y", np.y);
+    num.setAttribute("text-anchor", "middle");
+    num.setAttribute("dominant-baseline", "middle");
+    num.setAttribute("fill", "rgba(255,255,255,0.28)");
+    num.setAttribute("font-size", "14");
+    num.setAttribute("font-family", "Poppins, sans-serif");
+    num.setAttribute("font-weight", "500");
+    num.textContent = i + 1;
+    wheelSlices.appendChild(num);
+  }
+}
+buildWheel();
+
+const SPIN_DURATION = 4.5;
+
+function autoSpin(){
+  const targetRotation = 360 * 5 + 47; // 5 voltas + offset
+  wheel.style.transitionDuration = SPIN_DURATION + "s";
+  void wheel.offsetWidth;
+  wheel.style.transform = `rotate(${targetRotation}deg)`;
+
+  playSpinSound();
+
+  setTimeout(() => {
+    stopSpinSound();
+    playBeep(1.25, 0.45);
+    stage.classList.add("revealed");
+  }, SPIN_DURATION * 1000);
+}
+
+window.addEventListener("load", () => {
+  setTimeout(autoSpin, 350);
+});
+</script>
+</body>
+</html>
