@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../gm.ico" type="image/x-icon">
+<!-- Metatags essenciais para miniatura (Open Graph) -->
+<meta property="og:title" content="Conversation Wheel" />
+<meta property="og:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta property="og:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:url" content="https://dididoingles.github.io/conversationwheel/" />
+<meta property="og:type" content="website" />
+
+<!-- Metatags para o Twitter/X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Conversation Wheel" />
+<meta name="twitter:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta name="twitter:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<title>Conversation Spinner · Advanced</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e0e12;
+    --text: #f5f3ef;
+    --muted: #8a8a96;
+    --accent: #ffb86b;
+    --accent-2: #ff7a59;
+    --accent-3: #6be0c9;
+    --line: rgba(255,255,255,0.08);
+  }
+
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body{
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.58px;
+    overflow-x: hidden;
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, rgba(255,184,107,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 100%, rgba(107,224,201,0.08), transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,122,89,0.05), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .stage{
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px 16px;
+    gap: 40px;
+  }
+
+  header{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity 0.4s ease;
+  }
+  .eyebrow{
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+  h1{
+    font-size: clamp(24px, 3.4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -1.3px;
+    line-height: 1.1;
+  }
+  h1 span{
+    background: linear-gradient(100deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .main{
+    display: grid;
+    grid-template-columns: auto auto 260px;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(24px, 3.5vw, 56px);
+    width: 100%;
+    max-width: 1140px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wheel-wrap{
+    position: relative;
+    width: clamp(240px, 26vw, 340px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (min-width: 901px){
+    .wheel-wrap{
+      transform: translateX(-80px);
+    }
+  }
+
+  .wheel-glow{
+    position: absolute;
+    inset: -18%;
+    background: radial-gradient(circle, rgba(255,184,107,0.16), transparent 65%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+
+  svg.wheel{
+    width: 100%;
+    height: 100%;
+    transform: rotate(0deg);
+    transition: transform 4s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 20px 60px rgba(0,0,0,0.6));
+  }
+
+  svg.wheel path.used{
+    opacity: 0.28;
+    transition: opacity 0.6s ease;
+  }
+  svg.wheel text.used{
+    opacity: 0.18;
+    transition: opacity 0.6s ease;
+  }
+
+  .pointer{
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 22px solid var(--accent);
+    filter: drop-shadow(0 4px 10px rgba(255,184,107,0.5));
+    z-index: 3;
+  }
+
+  .hub{
+    position: absolute;
+    width: 22%;
+    height: 22%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #23232e, #0e0e12 70%);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: grid;
+    place-items: center;
+    z-index: 2;
+    box-shadow: 0 0 0 10px rgba(14,14,18,0.9), 0 10px 30px rgba(0,0,0,0.6);
+  }
+  .hub svg{ width: 40%; height: 40%; opacity: 0.9; }
+
+  .spin-side{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    width: clamp(220px, 24vw, 320px);
+  }
+
+  /* --- AGRUPAMENTO DOS BOTÕES --- */
+  .spin-actions{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .spin-btn{
+    font-family: inherit;
+    letter-spacing: -0.58px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e0e12;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    border: none;
+    border-radius: 100px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s;
+    box-shadow: 0 10px 30px rgba(255,140,90,0.25), inset 0 1px 0 rgba(255,255,255,0.4);
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+  }
+  .spin-btn:hover:not(:disabled){
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(255,140,90,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .spin-btn:active:not(:disabled){ transform: translateY(0); }
+  .spin-btn:disabled{ opacity: 0.55; cursor: not-allowed; }
+
+  /* --- BOTÃO DE TROCAR NÍVEL --- */
+  .level-btn{
+    font-family: inherit;
+    letter-spacing: -0.58px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 13px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .level-btn:hover{
+    border-color: rgba(255,184,107,0.5);
+    color: var(--accent);
+  }
+
+  .level-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .question{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    transition: opacity 0.4s ease;
+  }
+  .question .label{
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    transition: opacity 0.3s;
+  }
+  .question .text{
+    font-size: clamp(15px, 1.5vw, 18px);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.8px;
+    background: linear-gradient(180deg, #ffffff, #cfcfd8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: opacity 0.4s, transform 0.4s;
+    min-height: 3.9em;
+    display: flex;
+    align-items: center;
+  }
+  .question .text.fade{
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .panel{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .panel.revealed{
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .panel-title{
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  .timer-zone{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .timer-ring{
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 0 22px rgba(255,184,107,0.10));
+  }
+  .timer-ring svg{
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+  .timer-ring .track{
+    fill: none;
+    stroke: rgba(255,255,255,0.07);
+    stroke-width: 7;
+  }
+  .timer-ring .progress{
+    fill: none;
+    stroke: url(#gradTimer);
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-dasharray: 408.4;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+  }
+  .timer-time{
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -1.2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-time.warn{ color: var(--accent-2); }
+
+  .timer-actions{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ghost-btn{
+    font-family: inherit;
+    letter-spacing: -0.58px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .ghost-btn:hover{
+    border-color: rgba(255,184,107,0.5);
+    color: var(--accent);
+  }
+  .ghost-btn.primary{
+    background: rgba(255,184,107,0.12);
+    border-color: rgba(255,184,107,0.35);
+    color: var(--accent);
+  }
+  .ghost-btn.end{
+    background: rgba(255,122,89,0.10);
+    border-color: rgba(255,122,89,0.30);
+    color: var(--accent-2);
+  }
+  .ghost-btn.end:hover{
+    border-color: rgba(255,122,89,0.55);
+    color: var(--accent-2);
+  }
+
+  .hint{
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+    text-align: center;
+    line-height: 1.5;
+    opacity: 0.8;
+    max-width: 200px;
+  }
+
+  .footer{
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 16px 0 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+  }
+  .footer a{
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.25s ease, opacity 0.25s ease;
+  }
+  .footer a:hover{
+    color: var(--accent-2);
+    opacity: 0.9;
+  }
+
+  /* ============ OVERLAY "WELL DONE!" ============ */
+  .overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(8,8,11,0.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .overlay.open{
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .overlay-card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    text-align: center;
+    max-width: 420px;
+    padding: 16px;
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  }
+  .overlay.open .overlay-card{
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .check-wrap{
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 35% 30%, rgba(255,184,107,0.22), rgba(255,184,107,0.06) 70%);
+    border: 1px solid rgba(255,184,107,0.35);
+    box-shadow: 0 0 0 10px rgba(14,14,18,0.6), 0 0 40px rgba(255,140,90,0.25);
+  }
+  .check-wrap svg{
+    width: 48px;
+    height: 48px;
+  }
+  .check-wrap .check-path{
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+  }
+  .overlay.open .check-wrap .check-path{
+    animation: drawCheck 0.6s 0.25s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  @keyframes drawCheck{
+    to{ stroke-dashoffset: 0; }
+  }
+
+  .overlay-title{
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .overlay-text{
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: #c4c4d0;
+    line-height: 1.6;
+    max-width: 34ch;
+  }
+
+  .overlay-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 32px;
+    font-family: inherit;
+    letter-spacing: -0.58px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e0e12;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 14px 40px rgba(255,140,90,0.30), inset 0 1px 0 rgba(255,255,255,0.4);
+    margin-top: 4px;
+  }
+  .overlay-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(255,140,90,0.42), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .overlay-btn:active{ transform: translateY(0); }
+
+  /* ============ NOVO: OVERLAY "TROCAR NÍVEL" ============ */
+  .level-overlay {
+    position: fixed; inset: 0; z-index: 110; display: grid; place-items: center;
+    padding: 24px; background: rgba(8,8,11,0.85); backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .level-overlay.open { opacity: 1; pointer-events: auto; }
+  
+  .level-card {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    text-align: center; max-width: 400px; width: 100%; padding: 32px 24px;
+    background: #15151c; border: 1px solid var(--line); border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    transform: translateY(16px) scale(0.96); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  }
+  .level-overlay.open .level-card { transform: translateY(0) scale(1); opacity: 1; }
+
+  .level-title { font-size: 20px; font-weight: 600; letter-spacing: -0.8px; }
+  .level-subtitle { font-size: 13px; color: var(--muted); margin-top: -10px; }
+  
+  .level-options { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 10px; }
+  
+  .level-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-radius: 14px; border: 1px solid var(--line);
+    background: rgba(255,255,255,0.02); color: var(--text); text-decoration: none;
+    font-size: 15px; font-weight: 500; transition: all 0.2s ease; cursor: pointer;
+  }
+  .level-option:hover {
+    background: rgba(255,184,107,0.1); border-color: rgba(255,184,107,0.4);
+    color: var(--accent); transform: translateX(4px);
+  }
+  .level-option.active {
+    background: rgba(255,184,107,0.15); border-color: rgba(255,184,107,0.5);
+    color: var(--accent); pointer-events: none; 
+  }
+  .level-badge { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; }
+
+  /* ============ MOBILE / TABLET ============ */
+  @media (max-width: 900px){
+    .stage{
+      padding: 32px 18px 20px;
+      gap: 24px;
+      transition: gap 0.5s ease;
+    }
+
+    .main{
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 28px;
+      max-width: 420px;
+    }
+
+    .wheel-wrap{
+      width: clamp(260px, 78vw, 360px);
+      transform: none;
+    }
+
+    .spin-side{
+      width: 100%;
+      align-items: center;
+    }
+    
+    .spin-actions {
+      justify-content: center;
+      width: 100%;
+    }
+    
+    .spin-btn {
+      padding: 14px 24px;
+      font-size: 15px;
+    }
+
+    .question{
+      text-align: center;
+    }
+    .question .text{
+      justify-content: center;
+    }
+
+    .panel{
+      width: 100%;
+    }
+
+    .timer-ring{
+      width: 140px;
+      height: 140px;
+    }
+    .timer-time{
+      font-size: 34px;
+    }
+
+    .main.spinning-done .wheel-wrap{
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+      margin-bottom: -28px;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.4s ease, transform 0.5s ease, margin-bottom 0.5s ease, max-height 0.5s ease;
+    }
+
+    .stage.spinning-done header{
+      opacity: 0.35;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <header>
+    <div class="eyebrow">Advanced Level</div>
+    <h1>Spin the <span>Conversation</span></h1>
+  </header>
+
+  <div class="main" id="main">
+
+    <div class="wheel-wrap" id="wheelWrap">
+      <div class="wheel-glow"></div>
+      <div class="pointer"></div>
+      <svg class="wheel" id="wheel" viewBox="0 0 400 400" aria-hidden="true">
+        <defs>
+          <radialGradient id="rimGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="70%" stop-color="rgba(255,255,255,0.02)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0.10)"/>
+          </radialGradient>
+          <linearGradient id="gradTimer" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffb86b"/>
+            <stop offset="100%" stop-color="#ff7a59"/>
+          </linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="196" fill="url(#rimGrad)"/>
+        <g id="wheelSlices"></g>
+        <circle cx="200" cy="200" r="188" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+      </svg>
+      <div class="hub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ffb86b" stroke-width="2" stroke-linecap="round">
+          <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="spin-side">
+      <div class="spin-actions">
+        <button class="spin-btn" id="spinBtn">Girar a roleta</button>
+        <button class="level-btn" id="openLevelBtn" title="Trocar Nível">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 8h16M4 16h16"/>
+          </svg>
+          <span>Trocar nível</span>
+        </button>
+      </div>
+
+      <div class="question" id="question">
+        <div class="label" id="qLabel">Ready when you are</div>
+        <div class="text" id="qText">Pressione girar para sortear uma pergunta</div>
+      </div>
+    </div>
+
+    <aside class="panel" id="panel">
+
+      <div class="panel-title">Timer</div>
+
+      <div class="timer-zone">
+        <div class="timer-ring">
+          <svg viewBox="0 0 150 150">
+            <circle class="track" cx="75" cy="75" r="65"/>
+            <circle class="progress" id="timerProgress" cx="75" cy="75" r="65"/>
+          </svg>
+          <div class="timer-time" id="timerTime">1:00</div>
+        </div>
+        <div class="timer-actions">
+          <button class="ghost-btn primary" id="startTimer">Iniciar</button>
+          <button class="ghost-btn" id="resetTimer">Reiniciar</button>
+          <button class="ghost-btn end" id="endTimer">Encerrar</button>
+        </div>
+      </div>
+
+      <div class="hint">Fale em inglês por 1 minuto sobre o tópico sorteado</div>
+
+    </aside>
+  </div>
+
+  <footer class="footer">
+    desenvolvido por <a href="https://www.instagram.com/dicarvalho.prof/" target="_blank" rel="noopener noreferrer">@dicarvalho.prof</a> | <a href="https://wa.me/5516993272278/" target="_blank" rel="noopener noreferrer">Seja aluno</a>
+  </footer>
+
+</div>
+
+<!-- ============ OVERLAY "WELL DONE!" ============ -->
+<div class="overlay" id="overlay" aria-hidden="true" role="dialog" aria-label="Well done">
+  <div class="overlay-card">
+    <div class="check-wrap">
+      <svg viewBox="0 0 52 52" aria-hidden="true">
+        <path class="check-path" d="M14 27l8 8 16-18"/>
+      </svg>
+    </div>
+    <div class="overlay-title">Well done!</div>
+    <div class="overlay-text">Você concluiu o desafio. Continue praticando para manter a fluência.</div>
+    <button class="overlay-btn" id="continueBtn">Continuar</button>
+  </div>
+</div>
+
+<!-- ============ NOVO: OVERLAY "TROCAR NÍVEL" ============ -->
+<div class="level-overlay" id="levelOverlay" aria-hidden="true" role="dialog" aria-label="Trocar Nível">
+  <div class="level-card">
+    <div class="level-title">Selecione o Nível</div>
+    <div class="level-subtitle">Escolha o nível de dificuldade para praticar</div>
+    
+    <div class="level-options">
+      <a href="../easy/" class="level-option">
+        <span>Easy</span>
+      </a>
+      <a href="../intermediate/" class="level-option">
+        <span>Intermediate</span>
+      </a>
+      <a href="../advanced/" class="level-option active">
+        <span>Advanced</span>
+        <span class="level-badge">Atual</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+    /* =========================================================
+       ÁUDIOS — links do Cloudinary
+       ========================================================= */
+    const AUDIO_URLS = {
+      spin:     "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793829943/leom2024-roleta-267662_wapjdu.mp3",
+      clickGirar: "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793830082/liecio-achive-sound-132273_hs2pcu.mp3",
+      click:    "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793834548/freesound_community-camera-manual-click-39929_ebukss.mp3",
+      iniciar:  "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793884904/universfield-notification-beep-229154_v6nw9r.mp3",
+      encerrar: "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793885071/universfield-level-up-06-370051_xrt57z.mp3",
+      tictoc:   "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793885059/arunangshubanerjee-fossil-wrist-watch-ticking-studio-quality-timepiece-sound-fx-326607_tyhyay.mp3",
+      aviso:    "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1780093488/47313572-ui-sounds-pack-2-sound-8-358892_swimko.mp3"
+    };
+    /* ========================================================= */
+
+    /* ====== PERGUNTAS B1–B2 ====== */
+    const QUESTIONS = [
+     "To what extent does food shape cultural identity, and can a dish ever truly represent a nation?",
+  "If you could redesign the concept of a 'weekend' from scratch, what would it look like and why?",
+  "Some argue that travel broadens the mind; others say it merely reinforces stereotypes. Where do you stand?",
+  "How do daily routines reflect our values, and what might an outsider infer from yours?",
+  "Is genuine friendship possible across significant cultural or ideological divides? Justify your view.",
+  "Compare how nostalgia is used in contemporary cinema versus literature to shape collective memory.",
+  "How has the definition of 'family' evolved, and what does that reveal about society?",
+  "What role does spontaneity play in a well-lived life, and can it be cultivated deliberately?",
+  "Should pet ownership be considered a privilege, a right, or a responsibility? Defend your position.",
+  "When does a hobby cross the line into obsession, and who gets to decide?",
+  "Is career satisfaction a modern luxury or a fundamental human need? Argue both sides.",
+  "How does the design of a space influence behaviour, and what does your own environment say about you?",
+  "Evaluate the claim that stress is not an obstacle to success but a prerequisite for it.",
+  "How reliable is childhood memory, and what purpose does its imperfection serve?",
+  "Is seasonal nostalgia a genuine emotional experience or a commercially constructed one?",
+  "Has convenience culture diminished our appreciation for craftsmanship? Defend or refute.",
+  "How does language shape the way we perceive time, and what does your routine reveal about this?",
+  "Can music be objectively 'good', or is all aesthetic judgment ultimately subjective?",
+  "What distinguishes admiration from envy, and how should we respond to each?",
+  "Is the value of a gift determined by its intention, its cost, or its impact on the recipient?",
+  "Do competitive sports build character or merely expose it? Argue with concrete examples.",
+  "How would you persuade a sceptic that their hometown has genuine cultural value?",
+  "Is fear a rational guide or an obstacle to be systematically overcome?",
+  "Critically assess the idea that travel is more educational than formal study.",
+  "To what extent is lifelong learning a personal choice versus a social obligation?",
+  "How does personal style function as a form of communication, and can it ever be 'authentic'?",
+  "Do rainy days reveal something about our relationship with idleness and productivity?",
+  "Can a book change a person's worldview, or does it merely confirm what they already believe?",
+  "Compare the emotional and intellectual appeal of the beach versus the mountains.",
+  "What would a genuinely 'perfect' day look like, and is the pursuit of it worthwhile?"
+    ];
+
+    /* ====== SISTEMA DE ÁUDIO ====== */
+    const hasRealUrl = (u) => u && !u.startsWith("COLE_AQUI");
+
+    const audioSpin = new Audio();
+    audioSpin.src = hasRealUrl(AUDIO_URLS.spin) ? AUDIO_URLS.spin : "";
+    audioSpin.preload = "auto";
+    audioSpin.volume = 0.35;
+
+    const audioClick = new Audio();
+    audioClick.src = hasRealUrl(AUDIO_URLS.click) ? AUDIO_URLS.click : "";
+    audioClick.preload = "auto";
+    audioClick.volume = 0.5;
+
+    const audioIniciar = new Audio();
+    audioIniciar.src = hasRealUrl(AUDIO_URLS.iniciar) ? AUDIO_URLS.iniciar : "";
+    audioIniciar.preload = "auto";
+    audioIniciar.volume = 0.5;
+
+    const audioEncerrar = new Audio();
+    audioEncerrar.src = hasRealUrl(AUDIO_URLS.encerrar) ? AUDIO_URLS.encerrar : "";
+    audioEncerrar.preload = "auto";
+    audioEncerrar.volume = 0.55;
+
+    const audioTictoc = new Audio();
+    audioTictoc.src = hasRealUrl(AUDIO_URLS.tictoc) ? AUDIO_URLS.tictoc : "";
+    audioTictoc.preload = "auto";
+    audioTictoc.volume = 0.25;
+    audioTictoc.loop = true;
+
+    const audioAviso = new Audio();
+    audioAviso.src = hasRealUrl(AUDIO_URLS.aviso) ? AUDIO_URLS.aviso : "";
+    audioAviso.preload = "auto";
+    audioAviso.volume = 0.55;
+
+    const SPIN_DURATION = 4;
+
+    function playBeep(rate = 1, volume = 0.5){
+      if (!hasRealUrl(AUDIO_URLS.click)) return;
+      try{
+        const clone = audioClick.cloneNode();
+        clone.volume = volume;
+        clone.playbackRate = rate;
+        clone.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    function playSpinSound(){
+      if (!hasRealUrl(AUDIO_URLS.spin)) return;
+      try{
+        audioSpin.currentTime = 0;
+        audioSpin.playbackRate = 0.96 + Math.random() * 0.08;
+        audioSpin.volume = 0.35;
+        audioSpin.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    function stopSpinSound(){
+      if (!hasRealUrl(AUDIO_URLS.spin)) return;
+      try{
+        const startVol = audioSpin.volume;
+        if (startVol <= 0.01){
+          audioSpin.pause();
+          audioSpin.currentTime = 0;
+          audioSpin.volume = 0.35;
+          return;
+        }
+        const steps = 8;
+        let i = 0;
+        const fade = setInterval(() => {
+          i++;
+          const v = Math.max(0, startVol * (1 - i / steps));
+          audioSpin.volume = v;
+          if (i >= steps){
+            clearInterval(fade);
+            audioSpin.pause();
+            audioSpin.currentTime = 0;
+            audioSpin.volume = 0.35;
+          }
+        }, 50);
+      } catch(e){ /* silencioso */ }
+    }
+
+    function playIniciarSound(){
+      if (!hasRealUrl(AUDIO_URLS.iniciar)) return;
+      try{
+        const clone = audioIniciar.cloneNode();
+        clone.volume = audioIniciar.volume;
+        clone.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    function playEncerrarSound(){
+      if (!hasRealUrl(AUDIO_URLS.encerrar)) return;
+      try{
+        const clone = audioEncerrar.cloneNode();
+        clone.volume = audioEncerrar.volume;
+        clone.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    function startTictoc(){
+      if (!hasRealUrl(AUDIO_URLS.tictoc)) return;
+      try{
+        audioTictoc.currentTime = 0;
+        audioTictoc.playbackRate = 1;
+        audioTictoc.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    function stopTictoc(){
+      if (!hasRealUrl(AUDIO_URLS.tictoc)) return;
+      try{
+        audioTictoc.pause();
+        audioTictoc.currentTime = 0;
+        audioTictoc.playbackRate = 1;
+      } catch(e){ /* silencioso */ }
+    }
+
+    function playAviso(){
+      if (!hasRealUrl(AUDIO_URLS.aviso)) return;
+      try{
+        const clone = audioAviso.cloneNode();
+        clone.volume = audioAviso.volume;
+        clone.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    const audioClickGirar = new Audio();
+    audioClickGirar.src = hasRealUrl(AUDIO_URLS.clickGirar) ? AUDIO_URLS.clickGirar : "";
+    audioClickGirar.preload = "auto";
+    audioClickGirar.volume = 0.5;
+
+    function playClickGirar(){
+      if (!hasRealUrl(AUDIO_URLS.clickGirar)) return;
+      try{
+        const clone = audioClickGirar.cloneNode();
+        clone.volume = audioClickGirar.volume;
+        clone.play().catch(() => {});
+      } catch(e){ /* silencioso */ }
+    }
+
+    /* ====== CONSTRUÇÃO DA ROLETA ====== */
+    const SLICE_COLORS = [
+      "#1c1c26", "#23232f", "#2a2a38", "#1a1a23",
+      "#252532", "#1f1f2a", "#2c2c3b", "#181820"
+    ];
+
+    const wheelSlices = document.getElementById("wheelSlices");
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+    const qText = document.getElementById("qText");
+    const qLabel = document.getElementById("qLabel");
+    const panel = document.getElementById("panel");
+    const main = document.getElementById("main");
+    const stage = document.getElementById("stage");
+    const timerTime = document.getElementById("timerTime");
+    const timerProgress = document.getElementById("timerProgress");
+    const startTimerBtn = document.getElementById("startTimer");
+    const resetTimerBtn = document.getElementById("resetTimer");
+    const endTimerBtn = document.getElementById("endTimer");
+    const overlay = document.getElementById("overlay");
+    const continueBtn = document.getElementById("continueBtn");
+
+    /* Elementos do Modal de Nível */
+    const openLevelBtn = document.getElementById("openLevelBtn");
+    const levelOverlay = document.getElementById("levelOverlay");
+    const levelOptions = document.querySelectorAll(".level-option");
+
+    const SLICES = QUESTIONS.length;
+    const cx = 200, cy = 200, r = 188;
+    const sliceEls = [];
+
+    function polar(cx, cy, r, angleDeg){
+      const a = (angleDeg - 90) * Math.PI / 180;
+      return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+    }
+
+    function slicePath(startAngle, endAngle, rOuter){
+      const p1 = polar(cx, cy, rOuter, startAngle);
+      const p2 = polar(cx, cy, rOuter, endAngle);
+      const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+      return `M ${cx} ${cy} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} Z`;
+    }
+
+    function buildWheel(){
+      const sliceAngle = 360 / SLICES;
+      for (let i = 0; i < SLICES; i++){
+        const start = i * sliceAngle;
+        const end = start + sliceAngle;
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", slicePath(start, end, r));
+        path.setAttribute("fill", SLICE_COLORS[i % SLICE_COLORS.length]);
+        path.setAttribute("stroke", "rgba(255,255,255,0.06)");
+        path.setAttribute("stroke-width", "1");
+        wheelSlices.appendChild(path);
+
+        const mid = start + sliceAngle / 2;
+        const np = polar(cx, cy, r * 0.82, mid);
+        const num = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        num.setAttribute("x", np.x);
+        num.setAttribute("y", np.y);
+        num.setAttribute("text-anchor", "middle");
+        num.setAttribute("dominant-baseline", "middle");
+        num.setAttribute("fill", "rgba(255,255,255,0.28)");
+        num.setAttribute("font-size", "13");
+        num.setAttribute("font-family", "Poppins, sans-serif");
+        num.setAttribute("font-weight", "500");
+        num.textContent = i + 1;
+        wheelSlices.appendChild(num);
+
+        sliceEls.push({ path, text: num });
+      }
+    }
+    buildWheel();
+
+    /* ====== LÓGICA DO SORTEIO ====== */
+    let currentRotation = 0;
+    let isSpinning = false;
+    let deck = [];
+    let lastPickedIndex = -1;
+    let wheelHidden = false;
+
+    function refillDeck(){
+      deck = QUESTIONS.map((_, i) => i);
+      for (let i = deck.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      if (deck[0] === lastPickedIndex && deck.length > 1){
+        [deck[0], deck[1]] = [deck[1], deck[0]];
+      }
+    }
+
+    function resetWheelVisual(){
+      sliceEls.forEach(({ path, text }) => {
+        path.classList.remove("used");
+        text.classList.remove("used");
+      });
+    }
+
+    function markSliceUsed(index){
+      const el = sliceEls[index];
+      if (el){
+        el.path.classList.add("used");
+        el.text.classList.add("used");
+      }
+    }
+
+    function showWheel(){
+      if (!wheelHidden) return;
+      wheelHidden = false;
+      main.classList.remove("spinning-done");
+      stage.classList.remove("spinning-done");
+    }
+
+    refillDeck();
+
+    function spin(){
+      if (isSpinning) return;
+      isSpinning = true;
+      spinBtn.disabled = true;
+
+      showWheel();
+
+      playClickGirar();
+      playSpinSound();
+
+      qText.classList.add("fade");
+      qLabel.textContent = "Spinning...";
+
+      if (deck.length === 0){
+        resetWheelVisual();
+        refillDeck();
+      }
+
+      const index = deck.pop();
+      lastPickedIndex = index;
+
+      const sliceAngle = 360 / SLICES;
+      const turns = 5 + Math.floor(Math.random() * 3);
+      const sliceCenter = index * sliceAngle + sliceAngle / 2;
+      const jitter = (Math.random() - 0.5) * (sliceAngle * 0.6);
+      const targetRotation = currentRotation + turns * 360 - sliceCenter + jitter - (currentRotation % 360);
+
+      wheel.style.transitionDuration = SPIN_DURATION + "s";
+      void wheel.offsetWidth;
+      wheel.style.transform = `rotate(${targetRotation}deg)`;
+      currentRotation = targetRotation;
+
+      setTimeout(() => {
+        isSpinning = false;
+        spinBtn.disabled = false;
+
+        stopSpinSound();
+        playBeep(1.25, 0.4);
+
+        qText.textContent = QUESTIONS[index];
+        qText.classList.remove("fade");
+
+        markSliceUsed(index);
+
+        const remaining = deck.length;
+        qLabel.textContent = remaining > 0
+          ? `Your topic · ${remaining} left in this round`
+          : "Last one in this round · talk for 1 minute";
+
+        panel.classList.add("revealed");
+
+        if (window.matchMedia("(max-width: 900px)").matches){
+          main.classList.add("spinning-done");
+          stage.classList.add("spinning-done");
+          wheelHidden = true;
+        }
+
+        resetTimer();
+      }, SPIN_DURATION * 1000);
+    }
+
+    spinBtn.addEventListener("click", spin);
+
+    /* ====== TIMER ====== */
+    const TOTAL = 60;
+    let timeLeft = TOTAL;
+    let timerInterval = null;
+    let timerRunning = false;
+    const CIRCUMFERENCE = 2 * Math.PI * 65;
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+
+    function updateTimerDisplay(){
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      timerTime.textContent = `${m}:${s.toString().padStart(2,"0")}`;
+      const offset = CIRCUMFERENCE * (1 - timeLeft / TOTAL);
+      timerProgress.style.strokeDashoffset = offset;
+
+      if (timeLeft <= 10) timerTime.classList.add("warn");
+      else timerTime.classList.remove("warn");
+
+      // Acelera o tictoc nos últimos 10 segundos
+      if (hasRealUrl(AUDIO_URLS.tictoc)){
+        try{
+          audioTictoc.playbackRate = timeLeft <= 10 ? 1.6 : 1;
+        } catch(e){ /* silencioso */ }
+      }
+    }
+
+    function startTimer(){
+      if (timerRunning || timeLeft <= 0) return;
+      timerRunning = true;
+      startTimerBtn.textContent = "Pausar";
+
+      startTictoc();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0){
+          clearInterval(timerInterval);
+          timerInterval = null;
+          timerRunning = false;
+          startTimerBtn.textContent = "Iniciar";
+          timerTime.textContent = "0:00";
+          timerTime.classList.add("warn");
+
+          stopTictoc();
+          playEncerrarSound();
+
+          // Abre o modal automaticamente
+          setTimeout(openOverlay, 700);
+        }
+      }, 1000);
+    }
+
+    function pauseTimer(){
+      if (!timerRunning) return;
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerRunning = false;
+      startTimerBtn.textContent = "Retomar";
+      stopTictoc();
+    }
+
+    function resetTimer(){
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerRunning = false;
+      timeLeft = TOTAL;
+      startTimerBtn.textContent = "Iniciar";
+      updateTimerDisplay();
+      timerTime.classList.remove("warn");
+      stopTictoc();
+    }
+
+    startTimerBtn.addEventListener("click", () => {
+      if (timerRunning){
+        pauseTimer();
+      } else {
+        playIniciarSound();
+        startTimer();
+      }
+    });
+
+    resetTimerBtn.addEventListener("click", () => {
+      playBeep(0.9, 0.45);
+      resetTimer();
+    });
+
+    /* ====== ENCERRAR + OVERLAY ====== */
+    function openOverlay(){
+      if (timerRunning) pauseTimer();
+      stopTictoc();
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeOverlay(){
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      resetTimer();
+    }
+
+    endTimerBtn.addEventListener("click", () => {
+      playEncerrarSound();
+      openOverlay();
+    });
+
+    continueBtn.addEventListener("click", () => {
+      playBeep(1, 0.45);
+      closeOverlay();
+    });
+
+    /* ====== LÓGICA DO NOVO MODAL DE NÍVEL ====== */
+    function openLevelModal() {
+      playBeep(1, 0.45);
+      levelOverlay.classList.add("open");
+      levelOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLevelModal() {
+      levelOverlay.classList.remove("open");
+      levelOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    openLevelBtn.addEventListener("click", openLevelModal);
+
+    // Fecha o modal ao clicar fora do cartão
+    levelOverlay.addEventListener("click", (e) => {
+      if (e.target === levelOverlay) closeLevelModal();
+    });
+
+    // Adiciona som de clique e um pequeno delay nos links de mudança de nível
+    levelOptions.forEach(link => {
+      link.addEventListener("click", (e) => {
+        if (link.classList.contains("active")) {
+          e.preventDefault(); // Se for o nível atual, não faz nada
+          return;
+        }
+        e.preventDefault();
+        const href = link.getAttribute("href");
+        playBeep(1, 0.5);
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250); // Pequeno delay para o som tocar antes de mudar de página
+      });
+    });
+
+    /* ====== TECLAS DE ATALHO ====== */
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (levelOverlay.classList.contains("open")) closeLevelModal();
+        else if (overlay.classList.contains("open")) closeOverlay();
+      }
+    });
+
+    /* ====== INICIALIZAÇÃO ====== */
+    updateTimerDisplay();
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space"
+          && !overlay.classList.contains("open")
+          && !levelOverlay.classList.contains("open")
+          && document.activeElement !== startTimerBtn
+          && document.activeElement !== resetTimerBtn
+          && document.activeElement !== endTimerBtn
+          && document.activeElement !== continueBtn
+          && document.activeElement !== openLevelBtn){
+        e.preventDefault();
+        if (!isSpinning) spin();
+      }
+    });
+</script>
+</body>
+</html>
