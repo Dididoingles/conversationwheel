@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../gm.ico" type="image/x-icon">
+<!-- Metatags essenciais para miniatura (Open Graph) -->
+<meta property="og:title" content="Conversation Wheel" />
+<meta property="og:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta property="og:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:url" content="https://dididoingles.github.io/conversationwheel/" />
+<meta property="og:type" content="website" />
+
+<!-- Metatags para o Twitter/X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Conversation Wheel" />
+<meta name="twitter:description" content="Gire a roleta e pratique conversação em inglês!" />
+<meta name="twitter:image" content="https://dididoingles.github.io/conversationwheel/metatag.png" />
+<title>Conversation wheel · escolha o nível</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e0e12;
+    --text: #f5f3ef;
+    --muted: #8a8a96;
+    --accent: #ffb86b;
+    --accent-2: #ff7a59;
+    --accent-3: #6be0c9;
+    --line: rgba(255,255,255,0.08);
+  }
+
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body{
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.58px;
+    overflow: hidden;
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, rgba(255,184,107,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 100%, rgba(107,224,201,0.08), transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,122,89,0.05), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero{
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    padding: 32px clamp(24px, 6vw, 96px) 12px;
+    padding-top: max(32px, env(safe-area-inset-top));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .eyebrow{
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+
+  h1{
+    font-size: clamp(28px, 4.2vw, 48px);
+    font-weight: 700;
+    letter-spacing: -1.6px;
+    line-height: 1.05;
+    max-width: 18ch;
+  }
+  h1 span{
+    background: linear-gradient(100deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lead{
+    font-size: clamp(13px, 1.3vw, 16px);
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 56ch;
+    font-weight: 400;
+  }
+
+  /* ============ CARDS DE NÍVEL ============ */
+  .levels{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .level{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 22px 20px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.015);
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .level:hover{
+    border-color: rgba(255,184,107,0.35);
+    background: rgba(255,184,107,0.04);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  }
+
+  .level-icon{
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,184,107,0.10);
+    border: 1px solid rgba(255,184,107,0.30);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .level-icon svg{ width: 22px; height: 22px; }
+
+  .level-body{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .level-tag{
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .level-title{
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .level-desc{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .level-arrow{
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    transition: gap 0.25s ease;
+  }
+  .level-arrow svg{
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+  }
+  .level:hover .level-arrow{
+    gap: 10px;
+  }
+  .level:hover .level-arrow svg{
+    transform: translateX(2px);
+  }
+
+  /* ============ RODAPÉ ============ */
+  .footer{
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+    padding: 0 24px 20px;
+    margin-top: -56px;
+  }
+  .footer a{
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.25s ease, opacity 0.25s ease;
+  }
+  .footer a:hover{
+    color: var(--accent-2);
+    opacity: 0.9;
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 900px){
+    .levels{
+      grid-template-columns: 1fr;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 720px){
+    html, body{
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .hero{
+      height: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 36px 18px 20px;
+      gap: 20px;
+    }
+    h1{ letter-spacing: -1.4px; }
+
+    .footer{
+      margin-top: 0;
+      padding-bottom: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main class="hero">
+
+  <div class="eyebrow">Conversation wheel</div>
+
+  <h1><span>Níveis</span> de dificuldade</h1>
+
+  <p class="lead">
+    Selecione um nível. Cada roleta traz perguntas pensadas para o vocabulário e a fluência daquele estágio.
+  </p>
+
+  <div class="levels">
+
+    <!-- EASY -->
+    <a class="level level-link" href="../easy/">
+      <div class="level-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l2.4 6.3L21 10l-5 4.5L17.6 21 12 17.5 6.4 21 8 14.5 3 10l6.6-.7z"/>
+        </svg>
+      </div>
+      <div class="level-body">
+        <div class="level-tag">A1 – A2</div>
+        <div class="level-title">Easy</div>
+        <div class="level-desc">Perguntas simples do dia a dia, com vocabulário básico e frases curtas.</div>
+      </div>
+      <div class="level-arrow">
+        Começar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/>
+          <path d="M13 6l6 6-6 6"/>
+        </svg>
+      </div>
+    </a>
+
+    <!-- INTERMEDIATE -->
+    <a class="level level-link" href="../intermediate/">
+      <div class="level-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17l6-6 4 4 8-8"/>
+          <path d="M14 7h7v7"/>
+        </svg>
+      </div>
+      <div class="level-body">
+        <div class="level-tag">B1 – B2</div>
+        <div class="level-title">Intermediate</div>
+        <div class="level-desc">Temas que pedem opinião, experiências e frases mais elaboradas.</div>
+      </div>
+      <div class="level-arrow">
+        Começar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/>
+          <path d="M13 6l6 6-6 6"/>
+        </svg>
+      </div>
+    </a>
+
+    <!-- ADVANCED -->
+    <a class="level level-link" href="../advanced/">
+        <div class="level-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 21h8"/>
+              <path d="M12 17v4"/>
+              <path d="M6 4h12v4a6 6 0 0 1-12 0V4z"/>
+            </svg>
+          </div>
+      <div class="level-body">
+        <div class="level-tag">C1 – C2</div>
+        <div class="level-title">Advanced</div>
+        <div class="level-desc">Discussões profundas, argumentação e vocabulário sofisticado.</div>
+      </div>
+      <div class="level-arrow">
+        Começar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/>
+          <path d="M13 6l6 6-6 6"/>
+        </svg>
+      </div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer class="footer">
+  desenvolvido por <a href="https://www.instagram.com/dicarvalho.prof/" target="_blank" rel="noopener noreferrer">@dicarvalho.prof</a> | <a href="https://wa.me/5516993272278" target="_blank" rel="noopener noreferrer">Seja aluno</a>
+</footer>
+
+<script>
+const LEVEL_CLICK_URL = "https://res.cloudinary.com/dbwqwgbtx/video/upload/v1793834548/freesound_community-camera-manual-click-39929_ebukss.mp3";
+
+const hasRealUrl = (u) => u && !u.startsWith("COLE_AQUI");
+
+const audioClick = new Audio();
+audioClick.src = hasRealUrl(LEVEL_CLICK_URL) ? LEVEL_CLICK_URL : "";
+audioClick.preload = "auto";
+audioClick.volume = 0.5;
+
+let navigating = false;
+
+document.querySelectorAll(".level-link").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    if (navigating) {
+      e.preventDefault();
+      return;
+    }
+
+    if (!hasRealUrl(LEVEL_CLICK_URL)) return;
+
+    e.preventDefault();
+    navigating = true;
+
+    const targetHref = link.getAttribute("href");
+    let navigated = false;
+
+    const goToPage = () => {
+      if (navigated) return;
+      navigated = true;
+      window.location.href = targetHref;
+    };
+
+    const safetyTimer = setTimeout(goToPage, 400);
+
+    try {
+      audioClick.currentTime = 0;
+      const playPromise = audioClick.play();
+
+      if (playPromise && playPromise.then) {
+        playPromise
+          .then(() => {
+            setTimeout(() => {
+              clearTimeout(safetyTimer);
+              goToPage();
+            }, 200);
+          })
+          .catch(() => {
+            clearTimeout(safetyTimer);
+            goToPage();
+          });
+      } else {
+        setTimeout(() => {
+          clearTimeout(safetyTimer);
+          goToPage();
+        }, 200);
+      }
+    } catch (err) {
+      clearTimeout(safetyTimer);
+      goToPage();
+    }
+  });
+});
+
+// CORREÇÃO: Reseta a variável se o usuário voltar pelo botão do navegador
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted || (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]?.type === "back_forward")) {
+    navigating = false;
+  }
+});
+</script>
+</body>
+</html>
